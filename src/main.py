@@ -14,6 +14,7 @@ class MainApp:
         """Run the application."""
         print("Managing Model...")
         self.AIManager.ManageAI()
+        self.APIManager = APIManager()
 
 
 if __name__ == "__main__":
