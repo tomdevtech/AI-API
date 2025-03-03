@@ -15,6 +15,7 @@ Designed for **flexibility and scalability**, this API enables **seamless integr
 ---
 
 ## **📚 References & Further Reading**  
+🔥 [Inspiration Tech With Tim](https://youtu.be/cy6EAp4iNN4?feature=shared)
 📖 [Markdown Syntax Guide](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting)  
 📖 [About READMEs – GitHub Docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes#about-readmes)  
 ⚙️ [CI/CD Pipelines – Overview](https://www.atlassian.com/continuous-delivery/ci-vs-ci-vs-cd)  
