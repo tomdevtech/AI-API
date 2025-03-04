@@ -15,10 +15,12 @@ Designed for **flexibility and scalability**, this API enables **seamless integr
 ---
 
 ## **📚 References & Further Reading**  
-📹 [Inspiration Tech With Tim Video](https://youtu.be/cy6EAp4iNN4?feature=shared)<br>
-👾 [Inspiration Tech With Tim Code](https://github.com/techwithtim/API-For-Your-LLM/tree/main)<br>
-📖 [Markdown Syntax Guide](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting)  
-📖 [About READMEs – GitHub Docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes#about-readmes)  
-⚙️ [CI/CD Pipelines – Overview](https://www.atlassian.com/continuous-delivery/ci-vs-ci-vs-cd)  
-💡 [Ollama Documentation](https://ollama.com/docs)  
-🧠 [LangChain Docs](https://python.langchain.com/)   
+📹  [Inspiration Tech With Tim Video](https://youtu.be/cy6EAp4iNN4?feature=shared)<br>
+👾  [Inspiration Tech With Tim Code](https://github.com/techwithtim/API-For-Your-LLM/tree/main)<br>
+📖  [Markdown Syntax Guide](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting)  
+📖  [About READMEs – GitHub Docs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes#about-readmes)  
+⚙️  [CI/CD Pipelines – Overview](https://www.atlassian.com/continuous-delivery/ci-vs-ci-vs-cd)  
+💡  [Ollama Documentation](https://ollama.com/docs)
+💡  [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)
+💡  [Ollama REST API Postman Collection](https://www.postman.com/postman-student-programs/ollama-api/overview)
+🧠  [LangChain Docs](https://python.langchain.com/)   
