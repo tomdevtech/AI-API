@@ -1,152 +1,120 @@
 """This file provides basic authentication methods using FastAPI, JWT, and password hashing."""
 
-import secrets
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+import uvicorn
 
 class Token(BaseModel):
     """Model representing a JWT access token."""
-    access_token: str
-    token_type: str
+    AccessToken: str
+    TokenType: str
 
 class TokenData(BaseModel):
     """Model for storing token data, specifically the username."""
-    username: str or None = None
+    Username: str | None = None
 
 class User(BaseModel):
     """Model representing a user."""
-    username: str
-    email: str or None = None
-    full_name: str or None = None
-    disabled: bool or None = None
+    Username: str
+    Email: str | None = None
+    FullName: str | None = None
+    Disabled: bool | None = None
 
 class UserInDB(User):
     """Model representing a user stored in the database with a hashed password."""
-    hashed_password: str
+    HashedPassword: str
 
-class AuthServices:
+class AuthService:
     """Authentication services for creating tokens, verifying users, and managing authentication flow."""
 
     def __init__(self):
         """Initialize authentication service with default values."""
-        self.Token = ""
-        self.SECRET_KEY = ""
-        self.TokenDict = {}
-        self.ALGORITHM = "HS256"
-        self.ACCESS_TOKEN_EXPIRE_MINUTES = 30
-        self.TestDB = {
-            "test": {
-                "username": "max",
-                "full_name": "Max Mustermann",
-                "email": "MaxMuster@gmail.com",
-                "hashed_password": "$2b$12$HxWHkvMuL7WrZad6lcCfluNFj1/Zp63lvP5aUrKlSTYtoFzPXHOtu",
-                "disabled": False,
-            }
+        self.SecretKey = "83daa0256a2289b0fb23693bf1f6034d44396675749244721a2b20e896e11662"
+        self.Algorithm = "HS256"
+        self.AccessTokenExpireMinutes = 30
+        self.PwdContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
+        self.App = FastAPI()
+        self.TestDb = {
+            "test": UserInDB(
+                Username="max",
+                FullName="Max Mustermann",
+                Email="MaxMuster@gmail.com",
+                HashedPassword=self.PwdContext.hash("password"),
+                Disabled=False
+            )
         }
-        self.SECRET_KEY = (
-            "83daa0256a2289b0fb23693bf1f6034d44396675749244721a2b20e896e11662"
-        )
 
-    def CreateToken(self):
-        """Generate a random token using secrets."""
-        self.Token = secrets.token_hex(20)
+        @self.App.post("/token", response_model=Token)
+        async def Login(formData: OAuth2PasswordRequestForm = Depends()):
+            return await self.LoginForAccessToken(formData)
 
-    def CreateSecretKey(self):
-        """Placeholder for creating a new secret key."""
-        self.SECRET_KEY = ""
+        @self.App.get("/users/me/", response_model=User)
+        async def ReadUsersMe(CurrentUser: User = Depends(self.GetCurrentActiveUser)):
+            return CurrentUser
 
-    def verify_password(plain_password, hashed_password):
-        """Verify a plaintext password against its hashed version."""
-        return pwd_context.verify(plain_password, hashed_password)
+    def VerifyPassword(self, PlainPassword, HashedPassword):
+        return self.PwdContext.verify(PlainPassword, HashedPassword)
 
-    def get_password_hash(self, password):
-        """Generate a hash for a plaintext password."""
-        return pwd_context.hash(password)
+    def GetPasswordHash(self, Password):
+        return self.PwdContext.hash(Password)
 
-    def get_user(db, username: str):
-        """Retrieve a user from the database by username."""
-        if username in db:
-            user_data = db[username]
-            return UserInDB(**user_data)
+    def GetUser(self, Username: str):
+        return self.TestDb.get(Username)
 
-    def authenticate_user(db, username: str, password: str):
-        """Authenticate a user by verifying the username and password."""
-        user = get_user(db, username)
-        if not user:
-            return False
-        if not verify_password(password, user.hashed_password):
-            return False
-        return user
+    def AuthenticateUser(self, Username: str, Password: str):
+        User = self.GetUser(Username)
+        if not User or not self.VerifyPassword(Password, User.HashedPassword):
+            return None
+        return User
 
-    def create_access_token(data: dict, expires_delta: timedelta or None = None):
-        """Create a JWT access token."""
-        to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.utcnow() + expires_delta
-        else:
-            expire = datetime.utcnow() + timedelta(minutes=15)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-        return encoded_jwt
+    def CreateAccessToken(self, Data: dict, ExpiresDelta: timedelta | None = None):
+        ToEncode = Data.copy()
+        Expire = datetime.utcnow() + (ExpiresDelta or timedelta(minutes=15))
+        ToEncode.update({"exp": Expire})
+        return jwt.encode(ToEncode, self.SecretKey, algorithm=self.Algorithm)
 
-    async def get_current_user(token: str = Depends(oauth2_scheme)):
-        """Retrieve the current user based on the provided JWT token."""
-        credential_exception = HTTPException(
+    async def GetCurrentUser(self, Token: str = Depends()):
+        CredentialsException = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-            username: str = payload.get("sub")
-            if username is None:
-                raise credential_exception
-            token_data = TokenData(username=username)
+            Payload = jwt.decode(Token, self.SecretKey, algorithms=[self.Algorithm])
+            Username: str = Payload.get("sub")
+            if Username is None:
+                raise CredentialsException
         except JWTError:
-            raise credential_exception
-        user = get_user(db, username=token_data.username)
-        if user is None:
-            raise credential_exception
-        return user
+            raise CredentialsException
+        User = self.GetUser(Username)
+        if User is None:
+            raise CredentialsException
+        return User
 
-    async def get_current_active_user(current_user: UserInDB = Depends(get_current_user)):
-        """Ensure the current user is active (not disabled)."""
-        if current_user.disabled:
+    async def GetCurrentActiveUser(self, CurrentUser: User = Depends()):
+        if CurrentUser.Disabled:
             raise HTTPException(status_code=400, detail="Inactive user")
-        return current_user
+        return CurrentUser
 
-    @app.post("/token", response_model=Token)
-    async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
-        """Authenticate the user and return a JWT access token."""
-        user = authenticate_user(db, form_data.username, form_data.password)
-        if not user:
+    async def LoginForAccessToken(self, FormData: OAuth2PasswordRequestForm = Depends()):
+        User = self.AuthenticateUser(FormData.username, FormData.password)
+        if not User:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect username or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = create_access_token(
-            data={"sub": user.username}, expires_delta=access_token_expires
+        AccessTokenExpires = timedelta(minutes=self.AccessTokenExpireMinutes)
+        AccessToken = self.CreateAccessToken(
+            Data={"sub": User.Username}, ExpiresDelta=AccessTokenExpires
         )
-        return {"access_token": access_token, "token_type": "bearer"}
+        return {"AccessToken": AccessToken, "TokenType": "bearer"}
 
-    @app.get("/users/me/", response_model=User)
-    async def read_users_me(current_user: User = Depends(get_current_active_user)):
-        """Retrieve information about the current authenticated user."""
-        return current_user
-
-    @app.get("/users/me/items")
-    async def read_own_items(current_user: User = Depends(get_current_active_user)):
-        """Retrieve items belonging to the current authenticated user."""
-        return [{"item_id": 1, "owner": current_user}]
-
-    def Run():
-        """Initialize password context, OAuth2 scheme, and FastAPI application."""
-        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-        app = FastAPI()
+    def Run(self):
+        """Run the API."""
+        uvicorn.run(self.App, host="127.0.0.1", port=8000)

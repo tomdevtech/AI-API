@@ -14,6 +14,16 @@ Designed for **flexibility and scalability**, this API enables **seamless integr
 
 ---
 
+## **🛠️ Roadmap**  
+
+```mermaid
+timeline
+    V0.1 : Making the API for Authentication and the AI model work seperately
+    V1.0 : Connecting both APIs and make it work together
+```
+
+---
+
 ## **📚 References & Further Reading**  
 📹  [Inspiration Tech With Tim Video](https://youtu.be/cy6EAp4iNN4?feature=shared)<br>
 👾  [Inspiration Tech With Tim Code](https://github.com/techwithtim/API-For-Your-LLM/tree/main)<br>

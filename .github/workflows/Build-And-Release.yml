@@ -1,4 +1,4 @@
-name: Build and Release Python Exe
+name: Build and Release Python
 
 on:
   workflow_dispatch:
@@ -7,36 +7,26 @@ on:
       - "release/V*"
 
 jobs:
-  build-and-release:
+  BuildAndRelease:
     if: startsWith(github.ref, 'refs/heads/release/')
     runs-on: windows-latest 
 
     steps:
-      # Check out the repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Set up Python
-      - name: Set up Python
+      - name: Set Up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # Install PyInstaller
-      - name: Install PyInstaller
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyinstaller
+          pip install -r requirements.txt
 
-      # Build the Exe with PyInstaller
-      - name: Build Exe
-        run: |
-          pyinstaller --onefile src/main.py --name AIAPI
-          ls dist/
-
-      # Collect commits since last release
       - name: Collect Commit Messages
-        id: get_commits
+        id: GetCommits
         run: |
           git fetch --prune --unshallow || true
           $commits = git log $(git describe --tags --abbrev=0)..HEAD --oneline
@@ -44,18 +34,15 @@ jobs:
           Add-Content -Path $env:GITHUB_ENV -Value "$commits"
           Add-Content -Path $env:GITHUB_ENV -Value "EOF"
 
-      # Create a GitHub Release and Upload the Exe
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: dist/AIAPI.exe
           token: ${{ secrets.Token }}
           tag: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           body: |
-            This release contains the compiled Python Executable.
-            - **File:** `AIAPI.exe`
-
+            This release contains the latest Python source code.
+            
             Commits included in this release:
             ${{ env.commit_messages }}
           replacesArtifacts: true
