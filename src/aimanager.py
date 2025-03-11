@@ -14,8 +14,7 @@ class AIManager:
     """AI manager class for basic management of the model."""
 
     def __init__(
-        self,
-        ModelName,
+        self
     ):
         """
         Initialize the AI manager with the given parameters.
@@ -23,10 +22,11 @@ class AIManager:
         Args:
             ModelName (str): The name of the AI model to use.
         """
-        self.ModelName = ModelName
+        self.ModelName = ""
 
-    def CheckIfModelAvailability(self):
+    def CheckIfModelAvailability(self, ModelName: str):
         """Check if the specified model exists and pull if necessary."""
+        self.ModelName = ModelName
         try:
             Result = subprocess.run(
                 ["ollama", "list"],
@@ -85,7 +85,7 @@ class AIManager:
                 exit(1)
 
     @unittest.skip("Not needed for test.")
-    def ManageAI(self):
+    def ManageAI(self, ModelName: str):
         """
         Manage Ollama server and model availability.
 
@@ -93,5 +93,5 @@ class AIManager:
         is available. If the server is not running, it attempts to start it.
         If the model is not available, it downloads the specified model.
         """
-        self.CheckIfModelAvailability()
+        self.CheckIfModelAvailability(ModelName)
         self.CheckModelStatus()

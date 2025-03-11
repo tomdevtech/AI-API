@@ -135,16 +135,3 @@ class AuthService:
     def Run(self):
         """Start the FastAPI application using uvicorn."""
         uvicorn.run(self.App, host="127.0.0.1", port=8000)
-
-if __name__ == "__main__":
-    """Entry point for running the authentication service."""
-    auth_service = AuthService(
-        Password="your_password",
-        Username="your_username",
-        Email="your_email@example.com",
-        FullName="Your Full Name",
-        Disabled=False,
-        Algorithm="HS256",
-        AccessTokenExpireMinutes=30
-    )
-    auth_service.Run()

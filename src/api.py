@@ -1,81 +1,163 @@
 """
-This file provides a basic API to interact with an AI model.
-Collection: https://www.postman.com/postman-student-programs/ollama-api/
+This module provides an API to manage AI model interactions, including model creation,
+chat sessions, and API key management using FastAPI and Ollama.
 """
 
-from fastapi import FastAPI, Depends, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Query
+from aimanager import AIManager
 import ollama
-import os
+import subprocess
+import uvicorn
 from dotenv import load_dotenv
+import uuid
 
+class ApiManager:
+    """API Manager class for managing interactions with the AI model and API key validations."""
 
-class APIManager:
-    
     def __init__(self):
-        """Initialize the api."""
+        """Initialize the API with environment configurations and setup."""
         load_dotenv()
-        self.API_KEY_CREDITS = {os.getenv("API_KEY"): 5}
-        print(self.API_KEY_CREDITS)
-        self.app = FastAPI()
+        self.ApiKeyCredits = {}
+        self.DownloadedModels = set()
+        self.AiManager = AIManager()
+        self.App = FastAPI()
 
-    def verify_api_key(self, x_api_key: str = Header(None)):
-        self.credits = self.API_KEY_CREDITS.get(x_api_key, 0)
-        if self.credits <= 0:
-            raise HTTPException(
-                status_code=401, detail="Invalid API Key, or no credits"
-            )
+        # Generate initial API key & check if ollama server is running.
+        self.InitialApiKey = self.GenerateInitialApiKey()
+        self.AiManager.CheckModelStatus()
 
-        return x_api_key
+        # Register routes
+        self.App.get("/")(self.Root)
+        self.App.post("/generate")(self.Generate)
+        self.App.post("/chat")(self.Chat)
+        self.App.post("/version")(self.Version)
+        self.App.post("/generate-key")(self.GenerateApiKey)
+        self.App.post("/create")(self.Create)
+        self.App.get("/tags")(self.Tags)
+        self.App.post("/show")(self.Show)
+        self.App.post("/copy")(self.Copy)
+        self.App.delete("/delete")(self.Delete)
+        self.App.post("/pull")(self.Pull)
+        self.App.post("/push")(self.Push)
+        self.App.post("/embed")(self.Embed)
+        self.App.post("/ps")(self.Ps)
 
-    @app.post("/generate")
-    def generate(self, prompt: str, x_api_key: str = Depends(verify_api_key)):
-        self.API_KEY_CREDITS[x_api_key] -= 1
-        response = ollama.chat(
-            model="mistral", messages=[{"role": "user", "content": prompt}]
-        )
-        return {"response": response["message"]["content"]}
+    def Root(self):
+        """Root endpoint to confirm API is running."""
+        return {"message": "API is running!", "initial_api_key": self.InitialApiKey}
+
+    def GenerateInitialApiKey(self):
+        """Generate the initial API key on startup."""
+        apiKey = str(uuid.uuid4())
+        self.ApiKeyCredits[apiKey] = 5
+        return apiKey
+
+    def GenerateApiKey(self):
+        """Generate a new API key and assign initial credits if the previous key has 0 credits."""
+        if any(credits > 0 for credits in self.ApiKeyCredits.values()):
+            raise HTTPException(status_code=401, detail="API Key creation not necessary.")
+        apiKey = str(uuid.uuid4())
+        self.ApiKeyCredits[apiKey] = 5
+        return {"api_key": apiKey}
+
+    def VerifyApiKey(self, xApiKey: str = Header(..., description="API Key for authorization")):
+        """Verify if the API key is valid and has sufficient credits."""
+        if xApiKey not in self.ApiKeyCredits:
+            raise HTTPException(status_code=401, detail="API Key not found.")
+        if self.ApiKeyCredits[xApiKey] <= 0:
+            raise HTTPException(status_code=401, detail="No credits left. Please generate a new API key.")
+        return xApiKey
+
+    def DecrementCredits(self, xApiKey: str):
+        """Decrement the credit count for a valid API key."""
+        self.ApiKeyCredits[xApiKey] -= 1
+
+    def HandleOllamaResponse(self, func, *args, **kwargs):
+        """Generic handler for executing Ollama functions with error handling."""
+        try:
+            self.AiManager.CheckModelStatus()
+            return func(*args, **kwargs)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+    def Generate(self, Prompt: str = Query(...), Model: str = Query(...), XApiKey: str = Header(...)):
+        """Generate a response from the AI model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        self.AiManager.CheckIfModelAvailability(Model)
+        return self.HandleOllamaResponse(ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}])
+
+    def Chat(self, Prompt: str = Query(...), Model: str = Query(...), XApiKey: str = Header(...)):
+        """Initiate a chat session with the AI model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        self.AiManager.CheckIfModelAvailability(Model)
+        return self.HandleOllamaResponse(ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}])
+
+    def Version(self, XApiKey: str = Header(...)):
+        """Retrieve the current version of Ollama."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        try:
+            result = subprocess.run(["ollama", "--version"], capture_output=True, text=True, check=True)
+            return {"version": result.stdout.strip()}
+        except subprocess.CalledProcessError as e:
+            raise HTTPException(status_code=500, detail=f"Failed to retrieve Ollama version: {str(e)}")
+
+    def Create(self, Model: str = Query(...), XApiKey: str = Header(...)):
+        """Create a new model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.create, model=Model)
+
+    def Tags(self, XApiKey: str = Header(...)):
+        """List all available model tags."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.list)
+
+    def Show(self, Model: str = Query(...), XApiKey: str = Header(...)):
+        """Show information about a specific model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.show, model=Model)
+
+    def Copy(self, SourceModel: str = Query(...), DestinationModel: str = Query(...), XApiKey: str = Header(...)):
+        """Copy an existing model to a new destination."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.copy, sourceModel=SourceModel, destinationModel=DestinationModel)
+
+    def Delete(self, Model: str = Query(...), XApiKey: str = Header(...)):
+        """Delete a model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.delete, model=Model)
+
+    def Pull(self, Model: str = Query(...), XApiKey: str = Header(...)):
+        """Pull the latest version of a model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.pull, model=Model)
+
+    def Push(self, Model: str = Query(...), XApiKey: str = Header(...)):
+        """Push a model to the remote repository."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.push, model=Model)
+
+    def Embed(self, Model: str = Query(...), Data: str = Query(...), XApiKey: str = Header(...)):
+        """Embed data into a model."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.embed, model=Model, data=Data)
+
+    def Ps(self, XApiKey: str = Header(...)):
+        """List running model processes."""
+        XApiKey = self.VerifyApiKey(XApiKey)
+        self.DecrementCredits(XApiKey)
+        return self.HandleOllamaResponse(ollama.ps)
     
-    @app.post("/create")
-    def create(self):
-        print("Success!")
-
-    @app.get("/tags")
-    def tags(self, Permission):
-        if Permission == True:
-            print("Success!")
-
-    @app.post("/show")
-    def show(self):
-        print("Success!")
-
-    @app.post("/copy")
-    def copy(self):
-        print("Success!")
-    
-    @app.delete("/delete")
-    def delete(self):
-        print("Success!")
-
-    @app.post("/pull")
-    def pull(self):
-        print("Success!")
-
-    @app.post("/push")
-    def push(self):
-        print("Success!")
-
-    @app.post("/embed")
-    def embed(self):
-        print("Success!")
-
-    @app.post("/ps")
-    def ps(self):
-        print("Success!")
-
-    @app.post("/chat")
-    def chat(self):
-        print("Success!")
-
-    @app.post("/version")
-    def version(self):
-        print("Success!")
+    def Run(self):
+        """Run the FastAPI application using Uvicorn."""
+        uvicorn.run(self.App, host="127.0.0.1", port=8001)
