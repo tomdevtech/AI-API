@@ -11,6 +11,7 @@ import uvicorn
 from dotenv import load_dotenv
 import uuid
 
+
 class ApiManager:
     """API Manager class for managing interactions with the AI model and API key validations."""
 
@@ -55,17 +56,24 @@ class ApiManager:
     def GenerateApiKey(self):
         """Generate a new API key and assign initial credits if the previous key has 0 credits."""
         if any(credits > 0 for credits in self.ApiKeyCredits.values()):
-            raise HTTPException(status_code=401, detail="API Key creation not necessary.")
+            raise HTTPException(
+                status_code=401, detail="API Key creation not necessary."
+            )
         apiKey = str(uuid.uuid4())
         self.ApiKeyCredits[apiKey] = 5
         return {"api_key": apiKey}
 
-    def VerifyApiKey(self, xApiKey: str = Header(..., description="API Key for authorization")):
+    def VerifyApiKey(
+        self, xApiKey: str = Header(..., description="API Key for authorization")
+    ):
         """Verify if the API key is valid and has sufficient credits."""
         if xApiKey not in self.ApiKeyCredits:
             raise HTTPException(status_code=401, detail="API Key not found.")
         if self.ApiKeyCredits[xApiKey] <= 0:
-            raise HTTPException(status_code=401, detail="No credits left. Please generate a new API key.")
+            raise HTTPException(
+                status_code=401,
+                detail="No credits left. Please generate a new API key.",
+            )
         return xApiKey
 
     def DecrementCredits(self, xApiKey: str):
@@ -80,29 +88,47 @@ class ApiManager:
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
 
-    def Generate(self, Prompt: str = Query(...), Model: str = Query(...), XApiKey: str = Header(...)):
+    def Generate(
+        self,
+        Prompt: str = Query(...),
+        Model: str = Query(...),
+        XApiKey: str = Header(...),
+    ):
         """Generate a response from the AI model."""
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
         self.AiManager.CheckIfModelAvailability(Model)
-        return self.HandleOllamaResponse(ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}])
+        return self.HandleOllamaResponse(
+            ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}]
+        )
 
-    def Chat(self, Prompt: str = Query(...), Model: str = Query(...), XApiKey: str = Header(...)):
+    def Chat(
+        self,
+        Prompt: str = Query(...),
+        Model: str = Query(...),
+        XApiKey: str = Header(...),
+    ):
         """Initiate a chat session with the AI model."""
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
         self.AiManager.CheckIfModelAvailability(Model)
-        return self.HandleOllamaResponse(ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}])
+        return self.HandleOllamaResponse(
+            ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}]
+        )
 
     def Version(self, XApiKey: str = Header(...)):
         """Retrieve the current version of Ollama."""
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
         try:
-            result = subprocess.run(["ollama", "--version"], capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                ["ollama", "--version"], capture_output=True, text=True, check=True
+            )
             return {"version": result.stdout.strip()}
         except subprocess.CalledProcessError as e:
-            raise HTTPException(status_code=500, detail=f"Failed to retrieve Ollama version: {str(e)}")
+            raise HTTPException(
+                status_code=500, detail=f"Failed to retrieve Ollama version: {str(e)}"
+            )
 
     def Create(self, Model: str = Query(...), XApiKey: str = Header(...)):
         """Create a new model."""
@@ -122,11 +148,18 @@ class ApiManager:
         self.DecrementCredits(XApiKey)
         return self.HandleOllamaResponse(ollama.show, model=Model)
 
-    def Copy(self, SourceModel: str = Query(...), DestinationModel: str = Query(...), XApiKey: str = Header(...)):
+    def Copy(
+        self,
+        SourceModel: str = Query(...),
+        DestinationModel: str = Query(...),
+        XApiKey: str = Header(...),
+    ):
         """Copy an existing model to a new destination."""
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
-        return self.HandleOllamaResponse(ollama.copy, sourceModel=SourceModel, destinationModel=DestinationModel)
+        return self.HandleOllamaResponse(
+            ollama.copy, sourceModel=SourceModel, destinationModel=DestinationModel
+        )
 
     def Delete(self, Model: str = Query(...), XApiKey: str = Header(...)):
         """Delete a model."""
@@ -146,7 +179,12 @@ class ApiManager:
         self.DecrementCredits(XApiKey)
         return self.HandleOllamaResponse(ollama.push, model=Model)
 
-    def Embed(self, Model: str = Query(...), Data: str = Query(...), XApiKey: str = Header(...)):
+    def Embed(
+        self,
+        Model: str = Query(...),
+        Data: str = Query(...),
+        XApiKey: str = Header(...),
+    ):
         """Embed data into a model."""
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
@@ -157,7 +195,7 @@ class ApiManager:
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
         return self.HandleOllamaResponse(ollama.ps)
-    
+
     def Run(self):
         """Run the FastAPI application using Uvicorn."""
         uvicorn.run(self.App, host="127.0.0.1", port=8001)

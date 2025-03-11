@@ -1,5 +1,5 @@
 """
-This module contains unit tests for the `AuthService` class, which handles 
+This module contains unit tests for the `AuthService` class, which handles
 authentication using FastAPI, JWT, and password hashing with bcrypt.
 
 Tested Features:
@@ -8,7 +8,7 @@ Tested Features:
 - Access to protected routes with valid and invalid tokens
 - Authentication behavior for disabled users
 
-These tests ensure that the authentication logic behaves as expected and 
+These tests ensure that the authentication logic behaves as expected and
 provides accurate error handling and feedback.
 
 Dependencies:
@@ -21,6 +21,7 @@ import pytest
 from fastapi.testclient import TestClient
 from authservices import AuthService
 from fastapi import status
+
 
 @pytest.fixture(scope="module")
 def client():
@@ -37,9 +38,10 @@ def client():
         FullName="Test User",
         Disabled=False,
         Algorithm="HS256",
-        AccessTokenExpireMinutes=30
+        AccessTokenExpireMinutes=30,
     )
     return TestClient(service.App)
+
 
 def test_root(client):
     """
@@ -51,6 +53,7 @@ def test_root(client):
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"message": "Authentication API is running."}
+
 
 def test_generate_token(client):
     """
@@ -67,6 +70,7 @@ def test_generate_token(client):
     assert "AccessToken" in response.json()
     assert "TokenType" in response.json()
 
+
 def test_access_protected_route(client):
     """
     Test accessing a protected route with a valid token.
@@ -80,13 +84,11 @@ def test_access_protected_route(client):
     )
     assert login_response.status_code == 200
     token = login_response.json()["AccessToken"]
-    
-    response = client.get(
-        "/users/me/",
-        headers={"Authorization": f"Bearer {token}"}
-    )
+
+    response = client.get("/users/me/", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert response.json()["Username"] == "test"
+
 
 def test_invalid_token(client):
     """
@@ -96,11 +98,11 @@ def test_invalid_token(client):
         client (TestClient): The test client for API interaction.
     """
     response = client.get(
-        "/users/me/",
-        headers={"Authorization": "Bearer invalidtoken"}
+        "/users/me/", headers={"Authorization": "Bearer invalidtoken"}
     )
     assert response.status_code == 401
     assert response.json()["detail"] == "Could not validate credentials"
+
 
 def test_incorrect_login(client):
     """
@@ -116,6 +118,7 @@ def test_incorrect_login(client):
     assert response.status_code == 401
     assert response.json()["detail"] == "Incorrect username or password"
 
+
 def test_disabled_user(client):
     """
     Test accessing a protected route with a disabled user account.
@@ -130,7 +133,7 @@ def test_disabled_user(client):
         FullName="Disabled User",
         Disabled=True,
         Algorithm="HS256",
-        AccessTokenExpireMinutes=30
+        AccessTokenExpireMinutes=30,
     )
     temp_client = TestClient(service.App)
 
@@ -142,8 +145,7 @@ def test_disabled_user(client):
     token = login_response.json()["AccessToken"]
 
     response = temp_client.get(
-        "/users/me/",
-        headers={"Authorization": f"Bearer {token}"}
+        "/users/me/", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 400
     assert response.json()["detail"] == "Inactive user"

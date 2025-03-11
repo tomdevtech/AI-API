@@ -9,30 +9,48 @@ import uvicorn
 import secrets
 import bcrypt
 
+
 class Token(BaseModel):
     """Model representing a JWT access token."""
+
     AccessToken: str
     TokenType: str
 
+
 class TokenData(BaseModel):
     """Model for storing token data, specifically the username."""
+
     Username: str | None = None
+
 
 class User(BaseModel):
     """Model representing a user."""
+
     Username: str
     Email: str | None = None
     FullName: str | None = None
     Disabled: bool | None = None
 
+
 class UserInDB(User):
     """Model representing a user stored in the database with a hashed password."""
+
     HashedPassword: str
+
 
 class AuthService:
     """Authentication services for creating tokens, verifying users, and managing authentication flow."""
 
-    def __init__(self, Password, Username, Email, FullName, Disabled, Algorithm, AccessTokenExpireMinutes):
+    def __init__(
+        self,
+        Password,
+        Username,
+        Email,
+        FullName,
+        Disabled,
+        Algorithm,
+        AccessTokenExpireMinutes,
+    ):
         """Initialize authentication service with default values."""
         self.Password = Password
         self.SecretKey = secrets.token_hex(32)
@@ -46,7 +64,7 @@ class AuthService:
                 FullName=FullName,
                 Email=Email,
                 HashedPassword=self.GetPasswordHash(self.Password),
-                Disabled=Disabled
+                Disabled=Disabled,
             )
         }
 
@@ -60,11 +78,13 @@ class AuthService:
 
     def VerifyPassword(self, PlainPassword: str, HashedPassword: str):
         """Verify a plaintext password against its hashed version."""
-        return bcrypt.checkpw(PlainPassword.encode('utf-8'), HashedPassword.encode('utf-8'))
+        return bcrypt.checkpw(
+            PlainPassword.encode("utf-8"), HashedPassword.encode("utf-8")
+        )
 
     def GetPasswordHash(self, Password: str):
         """Hash a plaintext password using bcrypt."""
-        return bcrypt.hashpw(Password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
     def GetUser(self, Username: str):
         """Retrieve a user from the in-memory database by username."""
@@ -117,7 +137,9 @@ class AuthService:
             raise HTTPException(status_code=400, detail="Inactive user")
         return CurrentUser
 
-    async def LoginForAccessToken(self, FormData: OAuth2PasswordRequestForm = Depends()):
+    async def LoginForAccessToken(
+        self, FormData: OAuth2PasswordRequestForm = Depends()
+    ):
         """Generate a JWT token for the authenticated user."""
         User = self.AuthenticateUser(FormData.username, FormData.password)
         if not User:

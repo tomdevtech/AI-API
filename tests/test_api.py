@@ -1,5 +1,5 @@
 """
-This module contains unit tests for the `ApiManager` class, which manages 
+This module contains unit tests for the `ApiManager` class, which manages
 AI model interactions including creation, chat, and API key validation using FastAPI and Ollama.
 
 Tested Features:
@@ -69,7 +69,9 @@ def test_generate_model_response(client):
     """
     api_key = client.get("/").json().get("initial_api_key")
     headers = {"XApiKey": api_key}
-    response = client.post("/generate", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers)
+    response = client.post(
+        "/generate", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers
+    )
     assert response.status_code == 200
 
 
@@ -82,7 +84,9 @@ def test_chat_with_model(client):
     """
     api_key = client.get("/").json().get("initial_api_key")
     headers = {"XApiKey": api_key}
-    response = client.post("/chat", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers)
+    response = client.post(
+        "/chat", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers
+    )
     assert response.status_code == 200
 
 
@@ -145,7 +149,11 @@ def test_invalid_api_key(client):
     Args:
         client (TestClient): The test client for API interaction.
     """
-    response = client.post("/generate", params={"Prompt": "Hello", "Model": "test_model"}, headers={"XApiKey": "invalid_key"})
+    response = client.post(
+        "/generate",
+        params={"Prompt": "Hello", "Model": "test_model"},
+        headers={"XApiKey": "invalid_key"},
+    )
     assert response.status_code == 401
     assert response.json()["detail"] == "API Key not found."
 
@@ -160,10 +168,18 @@ def test_no_credits_left(client):
     api_key = client.get("/").json().get("initial_api_key")
     headers = {"XApiKey": api_key}
     for _ in range(6):
-        client.post("/generate", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers)
-    response = client.post("/generate", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers)
+        client.post(
+            "/generate",
+            params={"Prompt": "Hello", "Model": "test_model"},
+            headers=headers,
+        )
+    response = client.post(
+        "/generate", params={"Prompt": "Hello", "Model": "test_model"}, headers=headers
+    )
     assert response.status_code == 401
-    assert response.json()["detail"] == "No credits left. Please generate a new API key."
+    assert (
+        response.json()["detail"] == "No credits left. Please generate a new API key."
+    )
 
 
 def test_version(client):
