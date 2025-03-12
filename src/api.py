@@ -110,7 +110,7 @@ class ApiManager:
         self.ApiKeyCredits[xApiKey] -= 1
 
     def HandleOllamaResponse(self, func, *args, **kwargs):
-        """Handling of the Ollama models with error management."""
+        """Handle the Ollama models with error management."""
         try:
             self.AiManager.CheckModelStatus()
             return func(*args, **kwargs)
