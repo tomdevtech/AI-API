@@ -23,6 +23,36 @@ timeline
 ```
 
 ---
+# 🚀 **Quick Vulture Guide**  
+
+Vulture helps detect unused Python code. Here's a quick overview to get you started!  
+
+- 🔍 **Basic Scan:**  
+  ```bash
+  vulture myscript.py
+  ```
+  Or as a Python module:  
+  ```bash
+  python3 -m vulture myscript.py
+  ```
+
+- 📂 **Scan Multiple Files:**  
+  ```bash
+  vulture myscript.py mypackage/
+  ```
+
+- 🎯 **Only 100% Dead Code:**  
+  ```bash
+  vulture myscript.py --min-confidence 100
+  ```
+
+- 📝 **Generate Whitelist:**  
+  ```bash
+  vulture mydir --make-whitelist > whitelist.py
+  ```
+  
+This quick guide keeps your Python projects clean and efficient! 🚀
+---
 
 ## **📚 References & Further Reading**  
 📹  [Inspiration Tech With Tim Video](https://youtu.be/cy6EAp4iNN4?feature=shared)<br>
@@ -35,3 +65,5 @@ timeline
 💡  [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)<br>
 💡  [Ollama REST API Postman Collection](https://www.postman.com/postman-student-programs/ollama-api/overview)<br>
 🧠  [LangChain Docs](https://python.langchain.com/)<br>
+📃  [GitHub Code Workspaces](https://code.visualstudio.com/docs/editor/workspaces/workspaces)<br>
+📃  [Vulture Documentation](https://github.com/jendrikseipp/vulture)<br>
