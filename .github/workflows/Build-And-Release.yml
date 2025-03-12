@@ -8,7 +8,7 @@ on:
 
 jobs:
   BuildAndRelease:
-    if: startsWith(github.ref, 'refs/heads/release/')
+    if: startsWith(github.ref_name, 'V')
     runs-on: windows-latest
 
     steps:
@@ -36,11 +36,16 @@ jobs:
             Write-Output "No tags found. Using initial commit."
             $commits = git log --oneline
           } else {
-            $commits = git log $latestTag..HEAD --oneline
+            $commits = git log "$latestTag..HEAD" --oneline
           }
-          Add-Content -Path $env:GITHUB_ENV -Value "commit_messages<<EOF"
-          Add-Content -Path $env:GITHUB_ENV -Value "$commits"
-          Add-Content -Path $env:GITHUB_ENV -Value "EOF"
+
+          if ($commits) {
+            Add-Content -Path $env:GITHUB_ENV -Value "commit_messages<<EOF"
+            Add-Content -Path $env:GITHUB_ENV -Value "$commits"
+            Add-Content -Path $env:GITHUB_ENV -Value "EOF"
+          } else {
+            Add-Content -Path $env:GITHUB_ENV -Value "commit_messages=No new commits since last release."
+          }
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
@@ -50,7 +55,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           body: |
             This release contains the latest Python source code.
-            
+
             Commits included in this release:
             ${{ env.commit_messages }}
           replacesArtifacts: true
