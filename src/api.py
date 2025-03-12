@@ -25,7 +25,7 @@ class ApiManager:
         """Initialize the API with environment configurations and setup."""
         load_dotenv()
         self.ApiKeyCredits = {}
-        self._DownloadedModels = set()
+        self.DownloadedModels = set()
         self.AiManager = AIManager()
         self.App = FastAPI()
 

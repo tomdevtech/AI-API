@@ -77,7 +77,7 @@ class AuthService:
         self.SecretKey = secrets.token_hex(32)
         self.Algorithm = Algorithm
         self.AccessTokenExpireMinutes = AccessTokenExpireMinutes
-        self._Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
+        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
         self.App = FastAPI()
         self.TestDb = {
             "test": UserInDB(
