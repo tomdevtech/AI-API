@@ -9,7 +9,7 @@ on:
 jobs:
   BuildAndRelease:
     if: startsWith(github.ref, 'refs/heads/release/')
-    runs-on: windows-latest 
+    runs-on: windows-latest
 
     steps:
       - name: Checkout Code
@@ -25,11 +25,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest fastapi uvicorn python-jose passlib httpx bcrypt python-dotenv requests ollama python-multipart uuid
 
+      - name: Fetch All Tags
+        run: git fetch --prune --unshallow --tags || true
+
       - name: Collect Commit Messages
         id: GetCommits
         run: |
-          git fetch --prune --unshallow || true
-          $commits = git log $(git describe --tags --abbrev=0)..HEAD --oneline
+          $latestTag = git describe --tags --abbrev=0 2>$null
+          if (!$latestTag) {
+            Write-Output "No tags found. Using initial commit."
+            $commits = git log --oneline
+          } else {
+            $commits = git log $latestTag..HEAD --oneline
+          }
           Add-Content -Path $env:GITHUB_ENV -Value "commit_messages<<EOF"
           Add-Content -Path $env:GITHUB_ENV -Value "$commits"
           Add-Content -Path $env:GITHUB_ENV -Value "EOF"
