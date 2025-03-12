@@ -43,9 +43,7 @@ class ApiManager:
     """API Manager class for managing interactions with the AI model."""
 
     def __init__(self):
-        """
-        Initialize the API with environment configurations and setup.
-        """
+        """Initialize the API with environment configurations and setup."""
         load_dotenv()
         self.ApiKeyCredits = {}
         self._DownloadedModels = set()
@@ -112,7 +110,7 @@ class ApiManager:
         self.ApiKeyCredits[xApiKey] -= 1
 
     def HandleOllamaResponse(self, func, *args, **kwargs):
-        """Handler for executing Ollama."""
+        """Handling of the Ollama models with error management."""
         try:
             self.AiManager.CheckModelStatus()
             return func(*args, **kwargs)

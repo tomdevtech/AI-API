@@ -1,5 +1,6 @@
 """
 This file provides basic authentication methods.
+
 Using FastAPI, JWT, and password hashing.
 """
 
@@ -37,17 +38,20 @@ __all__ = [
 
 class Token(BaseModel):
     """Model representing a JWT access token."""
+
     AccessToken: str
     _TokenType: str
 
 
 class TokenData(BaseModel):
     """Model for storing token data, specifically the username."""
+
     Username: str | None = None
 
 
 class User(BaseModel):
     """Model representing a user."""
+
     Username: str
     Email: str | None = None
     FullName: str | None = None
@@ -55,14 +59,22 @@ class User(BaseModel):
 
 
 class UserInDB(User):
-    """Model representing a user stored in the database with a
-    hashed password."""
+    """
+    Model representing a user stored in the database.
+    
+    With a hashed password.
+    """
+
     HashedPassword: str
 
 
 class AuthService:
-    """Authentication services for creating tokens, verifying users,
-    and managing authentication flow."""
+    """
+    Authentication services.
+
+    For creating tokens, verifying users,
+    and managing authentication flow.
+    """
 
     def __init__(
         self,
