@@ -1,5 +1,6 @@
 """
 This module provides an API to manage AI model interactions.
+
 Including model creation,
 chat sessions, and API key management using FastAPI and Ollama.
 """
@@ -39,11 +40,12 @@ __all__ = [
 
 
 class ApiManager:
-    """API Manager class for managing interactions with the AI model and
-    API key validations."""
+    """API Manager class for managing interactions with the AI model."""
 
     def __init__(self):
-        """Initialize the API with environment configurations and setup."""
+        """
+        Initialize the API with environment configurations and setup.
+        """
         load_dotenv()
         self.ApiKeyCredits = {}
         self._DownloadedModels = set()
@@ -82,8 +84,7 @@ class ApiManager:
         return apiKey
 
     def GenerateApiKey(self):
-        """Generate a new API key and assign initial credits if
-        the previous key has 0 credits."""
+        """Generate a new API key."""
         if any(credits > 0 for credits in self.ApiKeyCredits.values()):
             raise HTTPException(
                 status_code=401, detail="API Key creation not necessary."
@@ -111,7 +112,7 @@ class ApiManager:
         self.ApiKeyCredits[xApiKey] -= 1
 
     def HandleOllamaResponse(self, func, *args, **kwargs):
-        """Generic handler for executing Ollama with error handling."""
+        """Handler for executing Ollama."""
         try:
             self.AiManager.CheckModelStatus()
             return func(*args, **kwargs)
