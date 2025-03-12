@@ -83,7 +83,7 @@ class AIManager:
                 print(f"Failed to start Ollama server: {E}")
                 exit(1)
 
-    def ManageAI(self, ModelName: str): # noqa: F401
+    def ManageAI(self, ModelName: str): # vulture: ignore
         """
         Manage Ollama server and model availability.
 
