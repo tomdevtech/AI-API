@@ -16,10 +16,10 @@ import bcrypt
 class Token(BaseModel):
     """Model representing a JWT access token."""
     AccessToken: str
-    TokenType: str # noqa: F401
+    TokenType: str # noqa: F841  # Reserved for token type specification
 
 
-class TokenData(BaseModel): # noqa: F401
+class TokenData(BaseModel): # noqa: F401  # Reserved for future data usage
     """Model for storing token data, specifically the username."""
     Username: str | None = None
 
@@ -57,7 +57,7 @@ class AuthService:
         self.SecretKey = secrets.token_hex(32)
         self.Algorithm = Algorithm
         self.AccessTokenExpireMinutes = AccessTokenExpireMinutes
-        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token") # noqa: F401
+        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token") # noqa: F841  # Placeholder for future dependency injection
         self.App = FastAPI()
         self.TestDb = {
             "test": UserInDB(
@@ -118,7 +118,7 @@ class AuthService:
         """Retrieve information about the current authenticated user."""
         return await self.GetCurrentActiveUser(CurrentUser)
 
-    async def GetCurrentUser(self, Token: str = Depends()): # noqa: F401
+    async def GetCurrentUser(self, Token: str = Depends()): # noqa: F401  # Reserved for advanced user retrieval
         """Retrieve the current user based on the provided JWT token."""
         CredentialsException = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -21,7 +21,7 @@ class ApiManager:
         """Initialize the API with environment configurations and setup."""
         load_dotenv()
         self.ApiKeyCredits = {}
-        self.DownloadedModels = set() # noqa: F401
+        self.DownloadedModels = set() # noqa: F841  # Reserved for future caching of downloaded models
         self.AiManager = AIManager()
         self.App = FastAPI()
 

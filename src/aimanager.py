@@ -5,7 +5,6 @@ This module defines the `AIManager` class, which facilitates
 model generation and availability checks.
 """
 
-import unittest
 import subprocess  # nosec B404
 import requests
 
