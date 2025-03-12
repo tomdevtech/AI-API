@@ -21,7 +21,7 @@ class ApiManager:
         """Initialize the API with environment configurations and setup."""
         load_dotenv()
         self.ApiKeyCredits = {}
-        self.DownloadedModels = set() # vulture: ignore
+        self._DownloadedModels = set()
         self.AiManager = AIManager()
         self.App = FastAPI()
 
@@ -211,6 +211,6 @@ class ApiManager:
         self.DecrementCredits(XApiKey)
         return self.HandleOllamaResponse(ollama.ps)
 
-    def Run(self): # vulture: ignore
+    def Run(self):
         """Run the FastAPI application using Uvicorn."""
         uvicorn.run(self.App, host="127.0.0.1", port=8001)

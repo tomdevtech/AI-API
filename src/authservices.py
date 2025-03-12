@@ -16,10 +16,10 @@ import bcrypt
 class Token(BaseModel):
     """Model representing a JWT access token."""
     AccessToken: str
-    TokenType: str # vulture: ignore
+    _TokenType: str
 
 
-class TokenData(BaseModel): # vulture: ignore
+class TokenData(BaseModel):
     """Model for storing token data, specifically the username."""
     Username: str | None = None
 
@@ -57,7 +57,7 @@ class AuthService:
         self.SecretKey = secrets.token_hex(32)
         self.Algorithm = Algorithm
         self.AccessTokenExpireMinutes = AccessTokenExpireMinutes
-        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token") # vulture: ignore
+        self._Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
         self.App = FastAPI()
         self.TestDb = {
             "test": UserInDB(
@@ -118,7 +118,7 @@ class AuthService:
         """Retrieve information about the current authenticated user."""
         return await self.GetCurrentActiveUser(CurrentUser)
 
-    async def GetCurrentUser(self, Token: str = Depends()): # vulture: ignore
+    async def GetCurrentUser(self, Token: str = Depends()):
         """Retrieve the current user based on the provided JWT token."""
         CredentialsException = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -162,6 +162,6 @@ class AuthService:
         )
         return {"AccessToken": AccessToken, "TokenType": "bearer"}
 
-    def Run(self): # vulture: ignore
+    def Run(self):
         """Start the FastAPI application using uvicorn."""
         uvicorn.run(self.App, host="127.0.0.1", port=8000)
