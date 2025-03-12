@@ -1,5 +1,6 @@
 """
-This module provides an API to manage AI model interactions, including model creation,
+This module provides an API to manage AI model interactions.
+Including model creation,
 chat sessions, and API key management using FastAPI and Ollama.
 """
 
@@ -46,7 +47,8 @@ class ApiManager:
 
     def Root(self):
         """Root endpoint to confirm API is running."""
-        return {"message": "API is running!", "initial_api_key": self.InitialApiKey}
+        return {"message": "API is running!", 
+                "initial_api_key": self.InitialApiKey}
 
     def GenerateInitialApiKey(self):
         """Generate the initial API key on startup."""
@@ -55,7 +57,8 @@ class ApiManager:
         return apiKey
 
     def GenerateApiKey(self):
-        """Generate a new API key and assign initial credits if the previous key has 0 credits."""
+        """Generate a new API key and assign initial credits if
+        the previous key has 0 credits."""
         if any(credits > 0 for credits in self.ApiKeyCredits.values()):
             raise HTTPException(
                 status_code=401, detail="API Key creation not necessary."
@@ -65,7 +68,8 @@ class ApiManager:
         return {"api_key": apiKey}
 
     def VerifyApiKey(
-        self, xApiKey: str = Header(..., description="API Key for authorization")
+        self, xApiKey: str = Header(..., description="""API Key for
+                                    authorization""")
     ):
         """Verify if the API key is valid and has sufficient credits."""
         if xApiKey not in self.ApiKeyCredits:
@@ -82,7 +86,7 @@ class ApiManager:
         self.ApiKeyCredits[xApiKey] -= 1
 
     def HandleOllamaResponse(self, func, *args, **kwargs):
-        """Generic handler for executing Ollama functions with error handling."""
+        """Generic handler for executing Ollama with error handling."""
         try:
             self.AiManager.CheckModelStatus()
             return func(*args, **kwargs)

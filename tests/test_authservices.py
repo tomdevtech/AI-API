@@ -1,8 +1,9 @@
 """
-Basic tests to ensure the AuthService class is not empty and can be instantiated.
+Basic tests to ensure the AuthService class is not empty and can be used.
 """
 
 from authservices import AuthService
+
 
 def test_auth_service_instantiation():
     """Test that AuthService can be instantiated."""

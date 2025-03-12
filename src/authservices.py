@@ -1,5 +1,6 @@
 """
-This file provides basic authentication methods using FastAPI, JWT, and password hashing.
+This file provides basic authentication methods.
+Using FastAPI, JWT, and password hashing.
 """
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -99,7 +100,8 @@ class AuthService:
             return None
         return User
 
-    def CreateAccessToken(self, Data: dict, ExpiresDelta: timedelta | None = None):
+    def CreateAccessToken(self, Data: dict, 
+                          ExpiresDelta: timedelta | None = None):
         """Create a JWT access token with an expiration time."""
         ToEncode = Data.copy()
         Expire = datetime.now(timezone.utc) + (
@@ -124,7 +126,8 @@ class AuthService:
             headers={"WWW-Authenticate": "Bearer"},
         )
         try:
-            Payload = jwt.decode(Token, self.SecretKey, algorithms=[self.Algorithm])
+            Payload = jwt.decode(Token, self.SecretKey,
+                                 algorithms=[self.Algorithm])
             Username: str = Payload.get("sub")
             if Username is None:
                 raise CredentialsException

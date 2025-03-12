@@ -1,8 +1,9 @@
 """
-Basic tests to ensure the ApiManager class is not empty and can be instantiated.
+Basic tests to ensure the ApiManager class is not empty and can be used.
 """
 
 from api import ApiManager
+
 
 def test_api_manager_instantiation():
     """Test that ApiManager can be instantiated."""
