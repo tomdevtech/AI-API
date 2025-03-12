@@ -10,7 +10,6 @@ import requests
 
 __all__ = [
     "AIManager",
-    "ManageAI"
 ]
 
 
