@@ -100,7 +100,7 @@ class AuthService:
             return None
         return User
 
-    def CreateAccessToken(self, Data: dict, 
+    def CreateAccessToken(self, Data: dict,
                           ExpiresDelta: timedelta | None = None):
         """Create a JWT access token with an expiration time."""
         ToEncode = Data.copy()

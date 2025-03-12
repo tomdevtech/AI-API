@@ -47,7 +47,7 @@ class ApiManager:
 
     def Root(self):
         """Root endpoint to confirm API is running."""
-        return {"message": "API is running!", 
+        return {"message": "API is running!",
                 "initial_api_key": self.InitialApiKey}
 
     def GenerateInitialApiKey(self):
