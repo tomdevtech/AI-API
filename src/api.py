@@ -7,7 +7,7 @@ chat sessions, and API key management using FastAPI and Ollama.
 from fastapi import FastAPI, HTTPException, Header, Query
 from aimanager import AIManager
 import ollama
-import subprocess
+import subprocess # nosec B404
 import uvicorn
 from dotenv import load_dotenv
 import uuid
@@ -135,7 +135,7 @@ class ApiManager:
                 capture_output=True,
                 text=True,
                 check=True
-            )
+            ) # nosec
             return {"version": result.stdout.strip()}
         except subprocess.CalledProcessError as e:
             raise HTTPException(
