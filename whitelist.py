@@ -1,3 +1,5 @@
+"""Whitelist file."""
+
 _.ManageAI  # unused method (src\aimanager.py:90)
 _.DownloadedModels  # unused attribute (src\api.py:28)
 _.Run  # unused method (src\api.py:217)
