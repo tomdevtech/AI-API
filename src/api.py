@@ -12,6 +12,31 @@ import uvicorn
 from dotenv import load_dotenv
 import uuid
 
+__all__ = [
+    "ApiManager",
+    "_DownloadedModels",
+    "Run",
+    "Root",
+    "GenerateInitialApiKey",
+    "GenerateApiKey",
+    "VerifyApiKey",
+    "DecrementCredits",
+    "HandleOllamaResponse",
+    "Generate",
+    "Chat",
+    "Version",
+    "Create",
+    "Tags",
+    "Show",
+    "Copy",
+    "Delete",
+    "Pull",
+    "Push",
+    "Embed",
+    "Ps"
+]
+
+
 
 class ApiManager:
     """API Manager class for managing interactions with the AI model and

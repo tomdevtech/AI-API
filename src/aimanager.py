@@ -8,6 +8,11 @@ model generation and availability checks.
 import subprocess  # nosec B404
 import requests
 
+__all__ = [
+    "AIManager",
+    "ManageAI"
+]
+
 
 class AIManager:
     """AI manager class for basic management of the model."""
