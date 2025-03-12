@@ -1,6 +1,8 @@
-"""This file provides basic authentication methods using FastAPI, JWT, and password hashing."""
+"""
+This file provides basic authentication methods using FastAPI, JWT, and password hashing.
+"""
 
-from fastapi import Depends, FastAPI, HTTPException, status, Request, Response
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
@@ -12,20 +14,17 @@ import bcrypt
 
 class Token(BaseModel):
     """Model representing a JWT access token."""
-
     AccessToken: str
     TokenType: str
 
 
 class TokenData(BaseModel):
     """Model for storing token data, specifically the username."""
-
     Username: str | None = None
 
 
 class User(BaseModel):
     """Model representing a user."""
-
     Username: str
     Email: str | None = None
     FullName: str | None = None
@@ -33,13 +32,14 @@ class User(BaseModel):
 
 
 class UserInDB(User):
-    """Model representing a user stored in the database with a hashed password."""
-
+    """Model representing a user stored in the database with a
+    hashed password."""
     HashedPassword: str
 
 
 class AuthService:
-    """Authentication services for creating tokens, verifying users, and managing authentication flow."""
+    """Authentication services for creating tokens, verifying users,
+    and managing authentication flow."""
 
     def __init__(
         self,
@@ -84,7 +84,9 @@ class AuthService:
 
     def GetPasswordHash(self, Password: str):
         """Hash a plaintext password using bcrypt."""
-        return bcrypt.hashpw(Password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+        return bcrypt.hashpw(
+            Password.encode("utf-8"), bcrypt.gensalt()
+        ).decode("utf-8")
 
     def GetUser(self, Username: str):
         """Retrieve a user from the in-memory database by username."""
@@ -100,7 +102,9 @@ class AuthService:
     def CreateAccessToken(self, Data: dict, ExpiresDelta: timedelta | None = None):
         """Create a JWT access token with an expiration time."""
         ToEncode = Data.copy()
-        Expire = datetime.now(timezone.utc) + (ExpiresDelta or timedelta(minutes=15))
+        Expire = datetime.now(timezone.utc) + (
+            ExpiresDelta or timedelta(minutes=15)
+        )
         ToEncode.update({"exp": Expire})
         return jwt.encode(ToEncode, self.SecretKey, algorithm=self.Algorithm)
 
@@ -150,7 +154,8 @@ class AuthService:
             )
         AccessTokenExpires = timedelta(minutes=self.AccessTokenExpireMinutes)
         AccessToken = self.CreateAccessToken(
-            Data={"sub": User.Username}, ExpiresDelta=AccessTokenExpires
+            Data={"sub": User.Username},
+            ExpiresDelta=AccessTokenExpires
         )
         return {"AccessToken": AccessToken, "TokenType": "bearer"}
 

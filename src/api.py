@@ -13,7 +13,8 @@ import uuid
 
 
 class ApiManager:
-    """API Manager class for managing interactions with the AI model and API key validations."""
+    """API Manager class for managing interactions with the AI model and
+    API key validations."""
 
     def __init__(self):
         """Initialize the API with environment configurations and setup."""
@@ -99,7 +100,9 @@ class ApiManager:
         self.DecrementCredits(XApiKey)
         self.AiManager.CheckIfModelAvailability(Model)
         return self.HandleOllamaResponse(
-            ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}]
+            ollama.chat,
+            model=Model,
+            messages=[{"role": "user", "content": Prompt}]
         )
 
     def Chat(
@@ -113,7 +116,9 @@ class ApiManager:
         self.DecrementCredits(XApiKey)
         self.AiManager.CheckIfModelAvailability(Model)
         return self.HandleOllamaResponse(
-            ollama.chat, model=Model, messages=[{"role": "user", "content": Prompt}]
+            ollama.chat,
+            model=Model,
+            messages=[{"role": "user", "content": Prompt}]
         )
 
     def Version(self, XApiKey: str = Header(...)):
@@ -122,12 +127,16 @@ class ApiManager:
         self.DecrementCredits(XApiKey)
         try:
             result = subprocess.run(
-                ["ollama", "--version"], capture_output=True, text=True, check=True
+                ["ollama", "--version"],
+                capture_output=True,
+                text=True,
+                check=True
             )
             return {"version": result.stdout.strip()}
         except subprocess.CalledProcessError as e:
             raise HTTPException(
-                status_code=500, detail=f"Failed to retrieve Ollama version: {str(e)}"
+                status_code=500,
+                detail=f"Failed to retrieve Ollama version: {str(e)}"
             )
 
     def Create(self, Model: str = Query(...), XApiKey: str = Header(...)):
@@ -158,7 +167,9 @@ class ApiManager:
         XApiKey = self.VerifyApiKey(XApiKey)
         self.DecrementCredits(XApiKey)
         return self.HandleOllamaResponse(
-            ollama.copy, sourceModel=SourceModel, destinationModel=DestinationModel
+            ollama.copy,
+            sourceModel=SourceModel,
+            destinationModel=DestinationModel
         )
 
     def Delete(self, Model: str = Query(...), XApiKey: str = Header(...)):
