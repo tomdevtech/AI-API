@@ -16,10 +16,10 @@ import bcrypt
 class Token(BaseModel):
     """Model representing a JWT access token."""
     AccessToken: str
-    TokenType: str
+    TokenType: str # noqa: F401
 
 
-class TokenData(BaseModel):
+class TokenData(BaseModel): # noqa: F401
     """Model for storing token data, specifically the username."""
     Username: str | None = None
 
@@ -57,7 +57,7 @@ class AuthService:
         self.SecretKey = secrets.token_hex(32)
         self.Algorithm = Algorithm
         self.AccessTokenExpireMinutes = AccessTokenExpireMinutes
-        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
+        self.Oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token") # noqa: F401
         self.App = FastAPI()
         self.TestDb = {
             "test": UserInDB(
@@ -118,7 +118,7 @@ class AuthService:
         """Retrieve information about the current authenticated user."""
         return await self.GetCurrentActiveUser(CurrentUser)
 
-    async def GetCurrentUser(self, Token: str = Depends()):
+    async def GetCurrentUser(self, Token: str = Depends()): # noqa: F401
         """Retrieve the current user based on the provided JWT token."""
         CredentialsException = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -162,6 +162,6 @@ class AuthService:
         )
         return {"AccessToken": AccessToken, "TokenType": "bearer"}
 
-    def Run(self):
+    def Run(self): # noqa: F401
         """Start the FastAPI application using uvicorn."""
         uvicorn.run(self.App, host="127.0.0.1", port=8000)

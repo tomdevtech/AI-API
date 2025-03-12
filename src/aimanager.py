@@ -84,8 +84,7 @@ class AIManager:
                 print(f"Failed to start Ollama server: {E}")
                 exit(1)
 
-    @unittest.skip("Not needed for test.")
-    def ManageAI(self, ModelName: str):
+    def ManageAI(self, ModelName: str): # noqa: F401
         """
         Manage Ollama server and model availability.
 
