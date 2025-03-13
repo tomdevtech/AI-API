@@ -54,6 +54,42 @@ Vulture helps detect unused Python code. Here's a quick overview to get you star
 This quick guide keeps your Python projects clean and efficient! 🚀
 ---
 
+## **📦 Prerequisites**  
+### **1️⃣ Clone the Repository**  
+```bash
+git clone https://github.com/tomdevtech/SimpleAI-Chatbot
+cd SimpleAI-Chatbot
+```
+
+### **2️⃣ Install Ollama**  
+🔗 [Download Ollama](https://ollama.com/download) and install it on your system.  
+
+📌 **No need to manually download the model!** 🧠  
+The code automatically downloads it when needed. 🚀  
+
+### **3️⃣ Install Required Python Libraries**  
+Run the following command to install all dependencies:  
+```bash
+pip install -r requirements.txt
+```
+
+Or install them manually:  
+```bash
+pip install [libraries]
+```
+
+### **4️⃣ Start the Chatbot 🚀**  
+Run the following command to launch the **Streamlit UI**:  
+```bash
+streamlit run YourDirectory/src/main.py
+```
+
+### **5️⃣ Success! 🎉**  
+✅ The chatbot is now up and running!  
+🎯 Experiment with different models and explore all features.  
+
+---
+
 ## **📚 References & Further Reading**  
 📹  [Inspiration Tech With Tim Video](https://youtu.be/cy6EAp4iNN4?feature=shared)<br>
 👾  [Inspiration Tech With Tim Code](https://github.com/techwithtim/API-For-Your-LLM/tree/main)<br>
