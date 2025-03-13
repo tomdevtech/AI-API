@@ -57,8 +57,8 @@ This quick guide keeps your Python projects clean and efficient! 🚀
 ## **📦 Prerequisites**  
 ### **1️⃣ Clone the Repository**  
 ```bash
-git clone https://github.com/tomdevtech/SimpleAI-Chatbot
-cd SimpleAI-Chatbot
+git clone https://github.com/tomdevtech/AI-API
+cd AI-API
 ```
 
 ### **2️⃣ Install Ollama**  
@@ -78,14 +78,10 @@ Or install them manually:
 pip install [libraries]
 ```
 
-### **4️⃣ Start the Chatbot 🚀**  
-Run the following command to launch the **Streamlit UI**:  
-```bash
-streamlit run YourDirectory/src/main.py
-```
+Execute the main.py file and have fun with interacting with the model! 🔥
 
 ### **5️⃣ Success! 🎉**  
-✅ The chatbot is now up and running!  
+✅ The chatbot is now up and running and you can login via API!  
 🎯 Experiment with different models and explore all features.  
 
 ---
