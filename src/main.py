@@ -8,8 +8,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 class MainApp:
-    """Main application class integrating authentication
-    and AI API services."""
+    """Main application for all services."""
 
     def __init__(self):
         """Initialize the MainApp with authentication and API managers."""
