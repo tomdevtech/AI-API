@@ -56,7 +56,8 @@ class MainApp:
             return await self.AuthService.LoginForAccessToken(FormData)
 
         @self.App.post("/secure-chat")
-        async def SecureChat(Prompt: str, Model: str, User=Depends(self.VerifyToken)):
+        async def SecureChat(Prompt: str, Model: str, 
+                             User=Depends(self.VerifyToken)):
             """Protected endpoint to interact with the AI model.
 
             Args:
@@ -68,7 +69,8 @@ class MainApp:
                 dict: AI model response.
             """
             ApiKey = self.ApiManager.GenerateInitialApiKey()
-            return self.ApiManager.Chat(Prompt=Prompt, Model=Model, XApiKey=ApiKey)
+            return self.ApiManager.Chat(Prompt=Prompt, 
+                                        Model=Model, XApiKey=ApiKey)
 
     async def VerifyToken(
         self, Token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login"))
@@ -79,7 +81,8 @@ class MainApp:
             Token (str): JWT token to verify.
 
         Raises:
-            HTTPException: If the token is invalid or the user cannot be verified.
+            HTTPException: If the token is invalid or the 
+            user cannot be verified.
 
         Returns:
             User: The authenticated user.
