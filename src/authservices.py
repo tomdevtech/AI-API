@@ -89,7 +89,7 @@ class AuthService:
             )
         }
 
-        self.App.post("/token", response_model=Token)(self.Login)
+        self.App.post("/login", response_model=Token)(self.Login)
         self.App.get("/users/me/", response_model=User)(self.ReadUsersMe)
         self.App.get("/", tags=["Root"])(self.Root)
 
