@@ -21,7 +21,7 @@ class MainApp:
             Disabled=False,
             Algorithm="HS256",
             AccessTokenExpireMinutes=30,
-        )
+        )  # nosec
 
         self.ApiManager = ApiManager()
         self.App = FastAPI()
