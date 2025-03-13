@@ -6,8 +6,10 @@ import uvicorn
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
+
 class MainApp:
-    """Main application class integrating authentication and AI API services."""
+    """Main application class integrating authentication
+    and AI API services."""
 
     def __init__(self):
         """Initialize the MainApp with authentication and API managers."""
@@ -18,7 +20,7 @@ class MainApp:
             FullName="Your Full Name",
             Disabled=False,
             Algorithm="HS256",
-            AccessTokenExpireMinutes=30
+            AccessTokenExpireMinutes=30,
         )
 
         self.ApiManager = ApiManager()
@@ -68,7 +70,9 @@ class MainApp:
             ApiKey = self.ApiManager.GenerateInitialApiKey()
             return self.ApiManager.Chat(Prompt=Prompt, Model=Model, XApiKey=ApiKey)
 
-    async def VerifyToken(self, Token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login"))):
+    async def VerifyToken(
+        self, Token: str = Depends(OAuth2PasswordBearer(tokenUrl="/login"))
+    ):
         """Verify the provided JWT token and return the authenticated user.
 
         Args:
@@ -93,6 +97,7 @@ class MainApp:
     def Run(self):
         """Run the FastAPI application using Uvicorn."""
         uvicorn.run(self.App, host="127.0.0.1", port=8002)
+
 
 if __name__ == "__main__":
     MainAppInstance = MainApp()
